@@ -1,5 +1,15 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/connexion", "destination": "/index.html" },
+    { "source": "/alertes", "destination": "/index.html" },
+    { "source": "/alertes/:id", "destination": "/index.html" },
+    { "source": "/carte", "destination": "/index.html" },
+    { "source": "/utilisateurs", "destination": "/index.html" },
+    { "source": "/utilisateurs/:uid", "destination": "/index.html" },
+    { "source": "/avis", "destination": "/index.html" },
+    { "source": "/journal", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -13,7 +23,7 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()" },
         { "key": "Cross-Origin-Opener-Policy", "value": "same-origin-allow-popups" },
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate" }
       ]
     },
     {
