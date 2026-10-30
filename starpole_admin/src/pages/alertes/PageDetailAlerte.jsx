@@ -12,6 +12,7 @@ import { useFluxAlertes } from '../../noyau/contexteFlux.js'
 import { useChargement } from '../../noyau/hooks.js'
 import { avisDeLAlerte, lireAlerte, nomsUtilisateurs, progressionAlerte } from '../../noyau/donnees.js'
 import { resoudreAlerte, supprimerAlerte } from '../../noyau/serveur.js'
+import { MODERATION } from '../../noyau/referentiel.js'
 import { dateHeure, duree, imageBase64 } from '../../noyau/format.js'
 
 // Tout ce qu'il faut pour la page : l'alerte, sa timeline, ses avis et les noms liés.
@@ -92,6 +93,7 @@ export default function PageDetailAlerte() {
               <dd className="nombre">{a.accepteLe ? `${dateHeure(a.accepteLe)} (après ${duree(a.accepteLe - a.creeLe)})` : '-'}</dd>
               <dt>Terminée</dt>
               <dd className="nombre">{a.termineLe ? `${dateHeure(a.termineLe)} (après ${duree(a.termineLe - a.creeLe)})` : '-'}</dd>
+              <dt>Vérification IA</dt><dd>{MODERATION[a.moderation] ?? <span className="indication">En attente</span>}</dd>
               <dt>Identifiant</dt><dd className="indication">{a.id}</dd>
             </dl>
           </div>

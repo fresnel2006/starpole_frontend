@@ -27,6 +27,15 @@ export const PERIODES = {
   90: '90 derniers jours',
 }
 
+// Identifiant utilisé par le serveur pour les suppressions faites par l'IA (Gemini).
+export const ADMIN_IA = 'moderation_ia'
+
+// État de la vérification d'une alerte par l'IA (champ `moderation`, écrit par le serveur).
+export const MODERATION = {
+  ok: "Vérifiée par l'IA",
+  non_verifiee: 'Non vérifiée (IA indisponible)',
+}
+
 // Libellés des actions du journal.
 export const ACTIONS_JOURNAL = {
   supprimer_alerte: 'Alerte supprimée',

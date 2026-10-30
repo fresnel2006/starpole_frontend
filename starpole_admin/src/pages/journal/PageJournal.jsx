@@ -4,7 +4,7 @@ import Tableau from '../../composants/Tableau.jsx'
 import { useChargement, usePagination } from '../../noyau/hooks.js'
 import { PROFIL_ABSENT, nomsUtilisateurs, pageJournal } from '../../noyau/donnees.js'
 import { useAuth } from '../../noyau/contexteAuth.js'
-import { ACTIONS_JOURNAL } from '../../noyau/referentiel.js'
+import { ACTIONS_JOURNAL, ADMIN_IA } from '../../noyau/referentiel.js'
 import { dateHeure } from '../../noyau/format.js'
 
 const chargerNoms = (cle) => nomsUtilisateurs(cle ? cle.split(',') : [])
@@ -20,13 +20,14 @@ function Cible({ cible, noms }) {
 export default function PageJournal() {
   const pagination = usePagination(pageJournal)
   const cle = pagination.elements
-    .flatMap((e) => [e.adminId, e.cible?.startsWith('utilisateurs/') ? e.cible.split('/')[1] : null])
+    .flatMap((e) => [e.adminId === ADMIN_IA ? null : e.adminId, e.cible?.startsWith('utilisateurs/') ? e.cible.split('/')[1] : null])
     .filter(Boolean).join(',')
   const { donnees: noms } = useChargement(chargerNoms, cle)
   const { utilisateur } = useAuth()
 
   // Un admin n'a pas forcément de profil dans l'appli : on affiche alors son nom de connexion.
   function nomAdmin(uid) {
+    if (uid === ADMIN_IA) return 'Vérification IA'
     const nom = noms?.[uid]
     if (nom !== PROFIL_ABSENT) return nom ?? '...'
     return uid === utilisateur.uid ? utilisateur.displayName || utilisateur.email : 'Administrateur'
