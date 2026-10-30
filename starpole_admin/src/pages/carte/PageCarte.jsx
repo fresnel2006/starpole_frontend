@@ -13,11 +13,12 @@ import { depuis, nombre } from '../../noyau/format.js'
 const aUnePosition = (a) => typeof a.latitude === 'number' && typeof a.longitude === 'number'
 
 // Filtres et alerte choisie dans l'adresse : /carte?statut=en_cours&alerte=abc
+// Par défaut, toutes les alertes sont affichées (les résolues sont atténuées).
 export default function PageCarte() {
   const { alertes, erreur } = useFluxAlertes()
   const [parametres, setParametres] = useSearchParams()
   const type = parametres.get('type') ?? ''
-  const statut = parametres.get('statut') ?? 'en_cours'
+  const statut = parametres.get('statut') ?? ''
   const quartier = parametres.get('quartier') ?? ''
   const choisieId = parametres.get('alerte')
   const choisie = alertes.find((a) => a.id === choisieId)
@@ -44,6 +45,14 @@ export default function PageCarte() {
   const choisir = useCallback((r) => changer({ alerte: r.id }), [changer])
   const pluriel = reperes.length > 1 ? 's' : ''
 
+  // Ce que la carte ne montre pas : alertes cachées par les filtres, alertes sans position.
+  const localisables = alertes.filter(aUnePosition).length
+  const masquees = localisables - reperes.length
+  const sansPosition = alertes.length - localisables
+  const filtresActifs = Boolean(type || statut || quartier)
+  // Recadrer la carte sur les repères quand les filtres changent (pas à chaque mise à jour en direct).
+  const cleCadrage = `${type}|${statut}|${quartier}`
+
   const choix = (nom, valeur, libelleTous, options) => (
     <select className="champ" value={valeur} onChange={(e) => changer({ [nom]: e.target.value })} aria-label={libelleTous}>
       <option value="">{libelleTous}</option>
@@ -54,6 +63,9 @@ export default function PageCarte() {
   return (
     <>
       <EnTetePage titre="Carte" sousTitre={`${nombre(reperes.length)} alerte${pluriel} affichée${pluriel} à Abidjan, en direct.`}>
+        {filtresActifs && (
+          <button className="bouton" onClick={() => changer({ type: null, statut: null, quartier: null })}>Tout afficher</button>
+        )}
         {choix('type', type, 'Tous les types', TYPES)}
         {choix('statut', statut, 'Tous les statuts', STATUTS)}
         {choix('quartier', quartier, 'Tous les quartiers', Object.fromEntries(QUARTIERS.map((q) => [q, q])))}
@@ -61,7 +73,14 @@ export default function PageCarte() {
 
       {erreur ? <div className="carte"><Erreur erreur={erreur} /></div> : (
         <div className="carte page-carte">
-          <CarteAbidjan reperes={reperes} surClic={choisir} selection={choisie} />
+          <CarteAbidjan reperes={reperes} surClic={choisir} selection={choisie} cleCadrage={cleCadrage} />
+
+          {(masquees > 0 || sansPosition > 0) && (
+            <div className="carte info-carte">
+              {masquees > 0 && <p>{nombre(masquees)} alerte{masquees > 1 ? 's' : ''} masquée{masquees > 1 ? 's' : ''} par les filtres.</p>}
+              {sansPosition > 0 && <p className="indication">{nombre(sansPosition)} alerte{sansPosition > 1 ? 's' : ''} sans position (non affichable{sansPosition > 1 ? 's' : ''}).</p>}
+            </div>
+          )}
 
           {choisie && (
             <div className="carte resume-carte">

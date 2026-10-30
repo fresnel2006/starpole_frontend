@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../noyau/contexteAuth.js'
 import { useFluxAlertes } from '../noyau/contexteFlux.js'
+import { useDeconnexionInactivite } from '../noyau/useDeconnexionInactivite.js'
 import Logo from '../composants/Logo.jsx'
 import Avatar from '../composants/Avatar.jsx'
 import RechercheRapide from '../composants/RechercheRapide.jsx'
@@ -25,6 +26,7 @@ export default function MiseEnPage() {
   const { utilisateur, deconnexion } = useAuth()
   const { nouvelles } = useFluxAlertes()
   const [recherche, setRecherche] = useState(false)
+  useDeconnexionInactivite(deconnexion)
   const nom = utilisateur.displayName || utilisateur.email
 
   // Ctrl+K (ou Cmd+K) ouvre la recherche rapide depuis n'importe quelle page.
@@ -67,7 +69,7 @@ export default function MiseEnPage() {
             <p>{utilisateur.displayName || 'Administrateur'}</p>
             <p className="indication">{utilisateur.email}</p>
           </div>
-          <button className="bouton icone" onClick={deconnexion} title="Se déconnecter" aria-label="Se déconnecter">
+          <button className="bouton icone" onClick={() => deconnexion()} title="Se déconnecter" aria-label="Se déconnecter">
             <LogOut size={18} />
           </button>
         </div>

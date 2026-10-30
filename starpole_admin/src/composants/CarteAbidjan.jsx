@@ -72,10 +72,12 @@ function ajouterCouches(carte, regrouper) {
 // « © Mapbox © OpenStreetMap » restent affichés (conditions d'utilisation).
 // reperes : [{ id, latitude, longitude, type, statut, titre }]
 // selection : l'alerte choisie ({ id, latitude, longitude }), entourée et centrée.
-export default function CarteAbidjan({ reperes, surClic, zoom = 11.5, centre, selection, regrouper = true }) {
+// cleCadrage : quand elle change (nouveaux filtres), la carte se recadre sur tous les repères.
+export default function CarteAbidjan({ reperes, surClic, zoom = 11.5, centre, selection, regrouper = true, cleCadrage }) {
   const conteneur = useRef(null)
   const carte = useRef(null)
   const surClicActuel = useRef(surClic)
+  const dernierCadrage = useRef(null)
   const [prete, setPrete] = useState(false)
 
   useEffect(() => { surClicActuel.current = surClic }, [surClic])
@@ -133,10 +135,19 @@ export default function CarteAbidjan({ reperes, surClic, zoom = 11.5, centre, se
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Données : mises à jour sans recréer la carte.
+  // Données : mises à jour sans recréer la carte. Au premier affichage et à chaque
+  // changement de filtres, on cadre la carte pour voir tous les repères.
+  const idSelection = selection?.id
   useEffect(() => {
-    if (prete) carte.current.getSource(SOURCE).setData(versGeoJson(reperes))
-  }, [prete, reperes])
+    if (!prete) return
+    const donnees = versGeoJson(reperes)
+    carte.current.getSource(SOURCE).setData(donnees)
+    if (cleCadrage === undefined || idSelection || dernierCadrage.current === cleCadrage || !donnees.features.length) return
+    dernierCadrage.current = cleCadrage
+    const limites = new mapboxgl.LngLatBounds()
+    for (const f of donnees.features) limites.extend(f.geometry.coordinates)
+    carte.current.fitBounds(limites, { padding: 80, maxZoom: 15, duration: 600 })
+  }, [prete, reperes, cleCadrage, idSelection])
 
   // Alerte choisie : anneau et centrage.
   const idChoisi = selection?.id ?? ''

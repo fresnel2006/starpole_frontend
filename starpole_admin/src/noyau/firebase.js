@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
+import { browserPopupRedirectResolver, browserSessionPersistence, initializeAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
 // Configuration web Firebase, lue dans .env.local (jamais dans le code).
@@ -20,5 +20,8 @@ export const configurationManquante = OBLIGATOIRES
 
 const app = configurationManquante.length ? null : initializeApp(configuration)
 
-export const auth = app ? getAuth(app) : null
+// Session limitée à l'onglet du navigateur : fermer le navigateur déconnecte l'administrateur.
+export const auth = app
+  ? initializeAuth(app, { persistence: browserSessionPersistence, popupRedirectResolver: browserPopupRedirectResolver })
+  : null
 export const db = app ? getFirestore(app) : null

@@ -2,7 +2,10 @@
 
 function cellule(valeur) {
   if (valeur == null) return ''
-  const texte = valeur instanceof Date ? valeur.toLocaleString('fr-FR') : String(valeur)
+  let texte = valeur instanceof Date ? valeur.toLocaleString('fr-FR') : String(valeur)
+  // Injection de formule : un texte saisi dans l'appli qui commence par = + - @ serait
+  // exécuté comme formule par Excel. On le neutralise avec une apostrophe.
+  if (typeof valeur === 'string' && /^[=+\-@\t\r]/.test(texte)) texte = `'${texte}`
   return /[";\n\r]/.test(texte) ? `"${texte.replace(/"/g, '""')}"` : texte
 }
 

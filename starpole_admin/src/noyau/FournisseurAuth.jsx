@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   GoogleAuthProvider,
   onAuthStateChanged,
@@ -52,6 +52,13 @@ export default function FournisseurAuth({ children }) {
     }
   }), [])
 
+  // `message` : raison affichée sur la page de connexion (session expirée, par exemple).
+  // Fonction stable : la déconnexion pour inactivité l'utilise dans un effet.
+  const deconnexion = useCallback((message = null) => {
+    setEtat((e) => ({ ...e, refus: message }))
+    return signOut(auth)
+  }, [])
+
   const valeur = {
     ...etat,
     async connexionGoogle() {
@@ -72,9 +79,7 @@ export default function FournisseurAuth({ children }) {
         setEtat((e) => ({ ...e, refus: messageErreur(erreur) }))
       }
     },
-    deconnexion() {
-      return signOut(auth)
-    },
+    deconnexion,
   }
 
   return <ContexteAuth.Provider value={valeur}>{children}</ContexteAuth.Provider>

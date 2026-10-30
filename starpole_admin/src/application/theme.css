@@ -380,3 +380,5 @@ kbd {
   .grille-2 { grid-template-columns: 1fr 1fr; }
   a { text-decoration: none; }
 }
+
+.info-carte { position: absolute; top: 16px; right: 64px; z-index: 2; padding: 10px 14px; font-size: 13px; max-width: 320px; }
